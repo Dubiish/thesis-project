@@ -64,7 +64,6 @@ Príklad použitia:
 
 - `200 OK` ak boli dáta získané úspešne
 - `204 No Content` ak požiadavka bola úspešná avšak neboli nájdené žiadne dáta vyhovujúce parametrom
-- `400 Bad Request` ak bol uvedený nesprávny token
 
 JSON objekt
 ```json
@@ -120,10 +119,12 @@ JSON odpoveď je rovnaká ako u [vyhľadávanie s tokenom](###Získanie-zariaden
 Rovnaký ako pri [vytváraní nového zariadenia](###Registrovanie-nového-zariadenia)
 
 **Odpoveď**
-- `204 No Content` ak aktualizácia prebehla úspešne
-- `400 Bad Request` ak chýba telo požiadavky
-- `404 Not Found` ak bol uvedený nesprávny token
+- `200 OK` ak aktualizácia prebehla úspešne
+- `400 Bad Request` ak chýba telo požiadavky alebo token
+- `404 Not Found` ak zariadenie neexistuje
 - `500 Internal Server Error`
+
+JSON odpoveď je objekt aktualizovaného zariadenia. Podobne ako pri `GET /devices/<token>`
 
 ### Odstránenie zariadenia
 
@@ -131,8 +132,9 @@ Rovnaký ako pri [vytváraní nového zariadenia](###Registrovanie-nového-zaria
 `DELETE /devices/<token>`
 
 **Odpoveď**
-- `204 No Content` ak bolo zariadenie odstránené
-- `404 Not Found` ak bol uvedený nesprávny token
+- `204 No Content` ak bolo zariadenie úspešne odstránené
+- `400 Bad Request` ak nebol uvedený token
+- `404 Not Found` ak požadované zariadenie neexistuje
 - `500 Internal Server Error`
 
 ## Dáta (Data)
@@ -154,7 +156,7 @@ Obsah sa môže líšiť podľa zariadenia! API rozhoduje ako dáta formovať po
 
 **Odpoveď**
 - `204 No Content` ak zápis prebehol úspešne
-- `400 Bad Request` ak v tele chýba povinná hodnota
+- `400 Bad Request` ak v tele alebo požiadavke chýba povinná hodnota alebo bola chybne uvedená
 - `404 Not Found` ak token zariadenia nie je platný resp. zariadenie neexistuje
 - `500 Internal Server Error`
 
@@ -170,7 +172,6 @@ TODO: Pridanie podpory vyhľadávanie na základe času
 
 **Odpoveď**
 - `200 OK` ak požiadavka prebehla úspešne a boli vrátené dáta
-- `204 No Content` ak požiadavka prebehla úspešne ale neboli nájdené žiadne dáta
 - `400 Bad Request` ak nebol zadaný žiadny token
 - `404 Not Found` ak bol použitý nesprávny token resp. zariadenie neexistuje
 - `500 Internal Server Error`
