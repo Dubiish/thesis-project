@@ -41,7 +41,7 @@ Zariadenia sú identifikované unikátnym identifikátorom s názvom *token*. Te
 
 - `201 Created` ak vytvorenie prebehlo úspešne
 - `500 Internal Server Error`
-- `400 Bad Request` ak je obsah požiadavky v zlom formáte
+- `400 Bad Request` ak je obsah požiadavky v zlom formáte alebo chýba niektorý z povinných údajov
 - `403 Forbidden` ak už je podobné zariadenie registrované
 
 ```json
@@ -75,14 +75,14 @@ JSON objekt
         "type": String,
         "location": String,
         "token": String,
-        "createdAt": Datetime String,
-        "updatedAt": Datetime String
+        "timestamp": Number
     },
     {
         ...
     }
 ]
 ```
+*Pozn. Timestamp je uvádzaný ako UNIX Timestamp v sekundách*
 
 ### Získanie zariadení s využitím filtra
 
@@ -167,31 +167,38 @@ Obsah sa môže líšiť podľa zariadenia! API rozhoduje ako dáta formovať po
 
 `GET /data/<token>`
 
-TODO: Pridanie podpory vyhľadávanie na základe času 
-- Napr. `GET /data/<token>?at=22.4.2020`
+**Filter**
+Dáta je možné taktiež filtrovať aj podľa UNIX Timestamp-u (v sekundách) pomocou parametrov `startDate` a `endDate`. 
+Napríklad:
+- `GET /data/<token>?startDate=1615049433`
+    - Dáta ktoré boli namerané od príslušného dátumu/času
+- `GET /data/<token>?startDate=X&endDate=Y`
+    - Dáta boli namerané od X do Y
 
 **Odpoveď**
 - `200 OK` ak požiadavka prebehla úspešne a boli vrátené dáta
 - `400 Bad Request` ak nebol zadaný žiadny token
 - `404 Not Found` ak bol použitý nesprávny token resp. zariadenie neexistuje
-- `500 Internal Server Error`
+- `204 No Content` ak požiadavka prebehla úspešne avšak žiadne dáta nevyhovujú filtru alebo neexistujú
 
 JSON objekt
 *Príklad JSON odpovedi na požiadavku získania dát z teplomera. Dáta v odpovede sa líšia na základe filtrovaného zariadenia*
 ```json
 {
-    "name": String,
-    "description": String,
-    "type": String,
-    ...
+    "device" {
+        "name": String,
+        "description": String,
+        "type": String,
+        ...
+    },
     "data": [
         {
             "value": Number,
-            "createdAt": Datetime String
+            "timestamp": Number
         },
         {
             "value": Number,
-            "createdAt": Datetime String
+            "timestamp": Number
         },
         ...
     ]
@@ -210,11 +217,12 @@ Príklad použitia:
 **Parametre**
 Všetky validné parametre zariadenia
 
+Taktiež je možné použiť parametre `startDate` a `endDate` s UNIX timestamp hodnotou (v sekundách) pre podrobnejšie filtrovanie podľa času a dátumu. (viď. [požiadavka na základe tokenu](###Podľa-tokenu-zariadenia))
+
 **Odpoveď**
 - `200 OK` ak požiadavka prebehla úspešne a boli vrátene dáta
 - `204 No Content` ak požiadavka prebehla úspešne avšak neboli nájdené žiadne dáta
 - `400 Bad Request` ak bol zle špecifikovaný filter resp. neboli uvedené žiadne parametre
 - `404 Not Found` ak neexistuje žiadne zariadenie vyhovujúce požiadavkám
-- `500 Internal Server Error`
 
 JSON objekt je podobný ako u [požiadavky na základe tokenu](####Podľa-tokenu-zariadenia) avšak jedná sa o zoznam viacerých zariadení vyhovujúcich filtru
