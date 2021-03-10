@@ -193,10 +193,12 @@ JSON objekt
     },
     "data": [
         {
+            "id": String,
             "value": Number,
             "timestamp": Number
         },
         {
+            "id": String,
             "value": Number,
             "timestamp": Number
         },
@@ -215,7 +217,7 @@ Príklad použitia:
 - `GET /data?name=MyLightSensor`
 
 **Parametre**
-Všetky validné parametre zariadenia
+Všetky valídne parametre zariadenia
 
 Taktiež je možné použiť parametre `startDate` a `endDate` s UNIX timestamp hodnotou (v sekundách) pre podrobnejšie filtrovanie podľa času a dátumu. (viď. [požiadavka na základe tokenu](###Podľa-tokenu-zariadenia))
 
@@ -226,3 +228,72 @@ Taktiež je možné použiť parametre `startDate` a `endDate` s UNIX timestamp 
 - `404 Not Found` ak neexistuje žiadne zariadenie vyhovujúce požiadavkám
 
 JSON objekt je podobný ako u [požiadavky na základe tokenu](####Podľa-tokenu-zariadenia) avšak jedná sa o zoznam viacerých zariadení vyhovujúcich filtru
+
+### Získanie jedného záznamu
+**Definícia**
+
+`GET /data/<token>/<id>`
+
+**Parametre**
+| Parameter   |      Typ      |  Pozn. |
+|----------|:-------------:|------:|
+| `token` |  string | identifikačný token zariadenia |
+| `id` |  string | ID záznamu |
+
+**Odpoveď**
+- `200 OK` ak požiadavka prebehla úspešne
+- `400 Bad Request` ak v požiadavke chýba povinný údaj
+- `404 Not Found` ak zariadenie zodpovedajúce tokenu neexistuje
+- `500 Internal Server Error`
+
+JSON objekt (Dáta sa môžu líšiť podľa typu zariadenia)
+```json
+{
+    "id": String,
+    "value": Number,
+    "timestamp": Number
+}
+```
+
+### Úprava dát
+**Definícia**
+
+`PUT /data/<token>/<id>`
+
+**Obsah tela**
+| Parameter   |      Typ      |  Pozn. |
+|----------|:-------------:|------:|
+| `value` |  number | Nová hodnota záznamu |
+| `timestamp` |  number | UNIX timestamp od (v sekundách) |
+
+**Odpoveď**
+- `204 No Content` ak požiadavka prebehla úspešne
+- `400 Bad Request` ak v požiadavke chýba niektorý z povinných údajov
+- `404 Not Found` ak zariadenie zodpovedajúce tokenu neexistuje
+- `500 Internal Server Error`
+
+### Mazanie dát
+**Definícia**
+
+Dáta je možne mazať dvoma spôsobmi:
+
+1. Podľa ID
+
+`DELETE /data/<token>?id=X`
+
+2. Podľa časového rozpätia
+
+`DELETE /data/<token>?startDate=X&endDate=X`
+
+**Parametre**
+| Parameter   |      Typ      |  Pozn. |
+|----------|:-------------:|------:|
+| `id` |  number | ID dátového záznamu |
+| `startDate` |  number | UNIX timestamp od (v sekundách) |
+| `endDate` |  number | UNIX timestamp do (v sekundách) |
+
+**Odpoveď**
+- `204 No Content` ak bola požiadavka úspešná a požadované záznamy boli zmazané
+- `400 Bad Request` ak chýba niektorý z povinných údajov v požiadavke
+- `404 Not Found` ak neexistuje zariadenie zodpovedajúce tokenu
+- `500 Internal Server Error`
