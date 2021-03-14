@@ -2,14 +2,16 @@ const express = require("express")
 const app = express()
 const bodyParser = require("body-parser")
 
-var routes = require("./lib/routing-handler")
+const devices = require("./lib/paths/devices-paths")
+const data = require("./lib/paths/data-paths")
 
 const PORT = 3000
 
 app.use(express.json())
 
-app.use("/", routes)
+app.use("/devices", devices)
+app.use("/data", data)
 
 app.listen(PORT, () => {
-    console.log(`API is listening on http://localhost:${PORT}`)
+    console.log(`API is running and listening on http://localhost:${PORT}`)
 })
