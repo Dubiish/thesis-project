@@ -147,9 +147,10 @@ JSON odpoveď je objekt aktualizovaného zariadenia. Podobne ako pri `GET /devic
 **Obsah tela**
 Obsah sa môže líšiť podľa zariadenia! API rozhoduje ako dáta formovať podľa typu zariadenia.
 
-(1) *thermometer* a *lightSensor*
+(1) Thermometer a lightSensor
+
 | Atribút   |      Typ      |  Pozn. |
-|----------|:-------------:|------:|
+|:----------:|:-------------:|:------:|
 | `value`* |  number | Nameraná hodnota |
 
 *Podpora zariadení bude rozširovaná priebežne*
@@ -235,10 +236,11 @@ JSON objekt je podobný ako u [požiadavky na základe tokenu](####Podľa-tokenu
 `GET /data/<token>/<id>`
 
 **Parametre**
+
 | Parameter   |      Typ      |  Pozn. |
 |----------|:-------------:|------:|
 | `token` |  string | identifikačný token zariadenia |
-| `id` |  string | ID záznamu |
+| `id` | string | ID záznamu |
 
 **Odpoveď**
 - `200 OK` ak požiadavka prebehla úspešne
@@ -261,6 +263,7 @@ JSON objekt (Dáta sa môžu líšiť podľa typu zariadenia)
 `PUT /data/<token>/<id>`
 
 **Obsah tela**
+
 | Parameter   |      Typ      |  Pozn. |
 |----------|:-------------:|------:|
 | `value` |  number | Nová hodnota záznamu |
@@ -286,6 +289,7 @@ Dáta je možne mazať dvoma spôsobmi:
 `DELETE /data/<token>?startDate=X&endDate=X`
 
 **Parametre**
+
 | Parameter   |      Typ      |  Pozn. |
 |----------|:-------------:|------:|
 | `id` |  number | ID dátového záznamu |
@@ -297,3 +301,58 @@ Dáta je možne mazať dvoma spôsobmi:
 - `400 Bad Request` ak chýba niektorý z povinných údajov v požiadavke
 - `404 Not Found` ak neexistuje zariadenie zodpovedajúce tokenu
 - `500 Internal Server Error`
+
+### Získanie stavu lampy
+
+**Definícia**
+
+`GET /data/lamp`
+
+**Obsah tela**
+
+| Parameter   |      Typ      |  Pozn. |
+|----------|:-------------:|------:|
+| `token`* |  string | Identifikačný token zariadenia |
+
+**Odpoveď**
+- `200 OK` ak bola požiadavka úspešne úspešná
+- `400 Bad Request` ak chýba povinný údaj v požiadavke
+- `500 Internal Server Error`
+
+JSON objekt
+```json
+{
+    "status": string,
+    "data": {
+        "isOn": bool,
+        "hue": number,
+        "sat": number,
+        "brightness": number
+    }
+}
+```
+
+### Zmena stavu lampy
+
+**Definícia**
+
+`PUT /data/lamp`
+
+**Obsah tela**
+| Parameter   |      Typ      |  Pozn. |
+|----------|:-------------:|------:|
+| `token`* |  string | Identifikačný token zariadenia |
+| `isOn` |  bool | Stav lampy |
+| `hue` |  number | Hodnota odtieňu svetla |
+| `sat` |  number | Saturácia svetla |
+| `brightness` |  number | Jas svetla |
+
+**Odpoveď**
+- `200 OK` ak požiadavka prebehla úspešne
+- `400 Bad Request` ak chýba povinný údaj v požiadavke
+- `500 Internal Servero Error`
+
+JSON objekt - objekt upravenej lampy (podobný ako pri získavaní lampy)
+
+
+
