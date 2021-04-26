@@ -255,7 +255,7 @@ describe("Práca s dátami", () => {
         })
     })
 
-    it("Úprava pridaných dát na základe filtra", () => {
+    it("Úprava pridaného záznamu dát", () => {
         return axios.post(server+"/devices", {
             "name": "thermometer01",
             "type": "thermometer",
@@ -268,30 +268,62 @@ describe("Práca s dátami", () => {
                 "value": 1
             }).then(dataResponse => {
                 const timestamp = dataResponse.data.data.timestamp
-                return axios.get(server+`/data?startDate=${timestamp}&endDate=${timestamp}`).then(valueResponse => {
-                    const id = valueResponse.data.data.id
-                    // ODPOVED ^
-                    // {
-                    //     "status": "OK",
-                    //     "data": {
-                    //         "device": {
-                    //             "name": "thermo01",
-                    //             "description": null,
-                    //             "address": "192.168.1.1",
-                    //             "type": "thermometer",
-                    //             "location": "bedroom",
-                    //             "token": "6817aa146a74d60b8aabbc621394b8bc",
-                    //             "timestamp": 1619359597
-                    //         },
-                    //         "data": [
-                    //             {
-                    //                 "id": "60857959cae6ef3c98abde8c",
-                    //                 "value": 1,
-                    //                 "timestamp": 1619360089
-                    //             }
-                    //         ]
-                    //     }
-                    // }
+                return axios.get(server+`/data?startDate=${timestamp}&endDate=${timestamp}&token=${token}`).then(valueResponse => {
+                    const id = valueResponse.data.data.data[0].id
+                    return axios.put(server+`/data/${id}`, {
+                        "token": token,
+                        "value": 3
+                    }).then(res => {
+                        assert(res.status === 200)
+                        assert(res.data.status === "OK")
+                    })
+                })
+            })
+        })
+    })
+
+    it("Odstránenie pridaných dát", () => {
+        return axios.post(server+"/devices", {
+            "name": "thermometer02",
+            "type": "thermometer",
+            "address": "192.168.0.2",
+            "location": "bedroom"
+        }).then(device => {
+            const token = device.data.token
+            return axios.post(server+"/data", {
+                "token": token,
+                "value": 2
+            }).then(dataResponse => {
+                const timestamp = dataResponse.data.data.timestamp
+                return axios.delete(server+`/data?startDate=${timestamp}&endDate=${timestamp}`, {
+                    data: {
+                        "token": token
+                    }
+                }).then(res => {
+                    assert(res.status === 200)
+                    assert(res.data.status === "OK")
+                })
+            })
+        })
+    })
+
+    it("Získanie konkrétneho záznamu dát na základe časového filtra", () => {
+        return axios.post(server+"/devices", {
+            "name": "thermometer03",
+            "type": "thermometer",
+            "address": "192.168.0.3",
+            "location": "bedroom"
+        }).then(device => {
+            const token = device.data.token
+            return axios.post(server+"/data", {
+                "token": token,
+                "value": 1
+            }).then(dataResponse => {
+                const timestamp = dataResponse.data.data.timestamp
+                return axios.get(server+`/data?startDate=${timestamp}&endDate=${timestamp}&token=${token}`).then(res => {
+                    assert(res.status === 200)
+                    assert(res.data.status === "OK")
+                    assert(res.data.data.data[0].value === 1)
                 })
             })
         })
