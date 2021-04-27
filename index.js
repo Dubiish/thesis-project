@@ -14,7 +14,7 @@ app.use(express.json())
 app.use("/devices", devices)
 app.use("/data", data)
 
-// Zakladna cesta, ktora vrati dokumentaciu
+// Zakladna cesta, ktora vrati dokumentaciu API
 app.all('/', (req, res) => {
 
     var path = __dirname + '/README.md';

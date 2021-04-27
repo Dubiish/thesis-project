@@ -177,7 +177,7 @@ describe("Práca s lampou", () => {
             "type": "lamp"
         }).then(device => {
             const token = device.data.token
-            return axios.get(server+`/data/lamp?token=${token}`).then((result) => {
+            return axios.get(server+`/data/lamp/${token}`).then((result) => {
                 assert(result.status === 200)
                 assert(result.data.status === "OK")
                 assert(Object.keys(result.data.data).length > 0)
@@ -188,7 +188,7 @@ describe("Práca s lampou", () => {
     })
 
     it("Získanie stavu neexistujúcej lampy", () => {
-        return axios.get(server+"/data/lamp?token=neexistujuciToken").then(result => {
+        return axios.get(server+"/data/lamp/neexistujuciToken").then(result => {
             throw Error
         }).catch(error => {
             assert(error.response.status === 404)
