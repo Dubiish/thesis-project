@@ -3,11 +3,17 @@
 
 ## Základné informácie
 
-Všetky odpovede sú v `JSON` formáte.
-Zariadenia sú identifikované unikátnym identifikátorom s názvom *token*. Tento identifikátor sa nemení a pomocou neho je možné vykonávať niektoré požiadavky cielené na konkrétne zariadenia. Rozhranie pracuje s požiadavkami obsahujúce telo v JSON formáte a taktiež `dopyt` (query). V prípade časových údajov sa jedná o `UNIX časové známky`.
+### Identifikátor
+Každé zariadenia je identifikovateľné pomocou unikátneho **identifikátora**, ktorý sa v systém označuje ako `token`. Tento identifikátor je nemenný a je vyžadovaný pri niektorých akciách, ktoré sú cielené na prácu s konkrétnym zariadením.
 
-Každá odpoveď obsahuje položku *status*, ktorá môže nadobudnúť stav `OK` alebo `Failed` podľa úspešnosti požiadavky.
-V prípade niektorých odpovedí (zväčša chybových hlásení) je možné nájsť v odpovedi taktiež parameter *message*, ktorý bližšie definuje zdroj chyby.
+### Odpovede
+Každá odpoveď resp. telo odpovede - ak nie je uvedené inak - je vo formáte **JSON**. Každá odpoveď obsahuje v tele položku `status`, ktorá môže nadobudnúť hodnotu ’*OK*’ alebo ’*Failed*’ na základe úspešnosti požiadavky. V prípade niektorých odpovedí (zvyčajne chybových hlášok) je možné v tele odpovede nájsť aj položku `message`, ktorá bližšie popisuje príčinu danej odpovede.
+
+### Požiadavky
+V prípade niektorých požiadaviek je povolené použiť **dopyt** (query) v adrese požiadavky. Rozhranie taktiež využíva údaje v tele požiadavky.
+
+### Časové údaje
+V prípade časových údajov (v odpovedi alebo v požiadavkách) sa jedná o **UNIX Časové známky** (UNIX Timestamp)
 
 ## Zariadenia (Devices)
 
@@ -27,6 +33,8 @@ V prípade niektorých odpovedí (zväčša chybových hlásení) je možné ná
 | `type`* |    string   |  Typ zariadenia (thermometer, lamp atď.) |
 | `location` |    string   |   Miestnosť v ktorej sa dané zariadenia nachádza |
 
+Ukážka obsahu tela požiadavky:
+
 ```json
 {
     "name": "...",
@@ -42,6 +50,8 @@ V prípade niektorých odpovedí (zväčša chybových hlásení) je možné ná
 - `500 Internal Server Error`
 - `400 Bad Request` ak je obsah požiadavky v zlom formáte alebo chýba niektorý z povinných údajov
 - `403 Forbidden` ak už je podobné zariadenie registrované
+
+Ukážka JSON odpovede:
 
 ```json
 {   
@@ -64,7 +74,7 @@ Príklad použitia:
 
 - `200 OK` ak boli dáta získané úspešne (ak dáta neexistujú položka devices ostáva vo forme prázdneho poľa)
 
-JSON objekt
+Ukážka JSON odpovede:
 
 ```json
     "status": "...",
@@ -113,6 +123,8 @@ Príklady použitia:
 
 - `200 OK` ak boli dáta získané úspešne (v prípade žiadneho obsahu ostáva obsah poľa "devices" prázdny)
 
+Ukážka JSON odpovede:
+
 ```json
 {
     "status": "...",
@@ -126,7 +138,7 @@ Príklady použitia:
 
 **Definícia**
 
-`GET /devices/<typ>`
+`GET /devices/:typ`
 
 | Typ zariadenia | Popis |
 |:----------|:-------|
@@ -137,7 +149,9 @@ Príklady použitia:
 
 **Odpoveď**
 
-- `200 OK` ak aktualizácia prebehla úspešne
+- `200 OK` ak požiadavka prebehla úspešne.
+
+Ukážka JSON odpovede:
 
 ```json
 {
@@ -161,6 +175,8 @@ Príklady použitia:
 Rovnaký ako pri [vytváraní nového zariadenia](###Registrovanie-nového-zariadenia)
 V tele je potrebné uviesť navyše položku *token* upravovaného zariadenia!
 
+Ukážka tela požiadavky:
+
 ```json
 {
     "token": "...",
@@ -174,6 +190,8 @@ V tele je potrebné uviesť navyše položku *token* upravovaného zariadenia!
 - `400 Bad Request` ak chýba telo požiadavky alebo token
 - `404 Not Found` ak zariadenie neexistuje
 - `500 Internal Server Error`
+
+Ukážka JSON odpovede:
 
 ```json
 {
@@ -192,7 +210,9 @@ JSON odpoveď je objekt aktualizovaného zariadenia. Podobne ako objekty v *devi
 
 **Obsah tela**
 
-V tele požiadavky je potrebné uviesť token mazaného zariadenia!
+V tele požiadavky je potrebné uviesť token odstraňovaného zariadenia!
+Ukážka tela požiadavky:
+
 ```json
 {
     "token": "..."
@@ -205,6 +225,8 @@ V tele požiadavky je potrebné uviesť token mazaného zariadenia!
 - `400 Bad Request` ak nebol uvedený token
 - `404 Not Found` ak požadované zariadenie neexistuje
 - `500 Internal Server Error`
+
+Ukážka JSON odpovede:
 
 ```json
 {
@@ -219,7 +241,7 @@ V tele požiadavky je potrebné uviesť token mazaného zariadenia!
 
 **Definícia**
 
-`POST /data/<token>`
+`POST /data/:token`
 
 **Obsah tela**
 
@@ -236,9 +258,11 @@ Obsah sa môže líšiť podľa zariadenia! API rozhoduje ako dáta formovať po
 **Odpoveď**
 
 - `201 Created` ak zápis prebehol úspešne
-- `400 Bad Request` ak v tele alebo požiadavke chýba povinná hodnota alebo bola chybne uvedená
+- `400 Bad Request` ak v tele alebo požiadavke chýba povinná hodnota alebo bola hodnota chybne uvedená
 - `404 Not Found` ak token zariadenia nie je platný resp. zariadenie neexistuje
 - `500 Internal Server Error`
+
+Ukážka JSON odpovede:
 
 ```json
 {
@@ -260,18 +284,18 @@ Obsah sa môže líšiť podľa zariadenia! API rozhoduje ako dáta formovať po
 Dáta je možné taktiež filtrovať aj podľa UNIX Timestamp-u (v sekundách) pomocou parametrov `startDate` a `endDate`. 
 Napríklad:
 - `GET /data/:token?startDate=1615049433`
-    - Dáta ktoré boli namerané od príslušného dátumu/času
+    - Vráti dáta, ktoré boli namerané od príslušného dátumu/času až po súčasnosť.
 - `GET /data/:token?startDate=X&endDate=Y`
-    - Dáta boli namerané od X do Y
+    - Vráti dáta, ktoré boli namerané medzi časom X a Y
 
 **Odpoveď**
 
 - `200 OK` ak požiadavka prebehla úspešne
 - `400 Bad Request` ak nebol zadaný žiadny token
 - `404 Not Found` ak bol použitý nesprávny token resp. zariadenie neexistuje
+- `500 Internal Server Error`
 
-JSON objekt
-*Príklad JSON odpovedi na požiadavku získania dát z teplomera. Dáta v odpovede sa líšia na základe filtrovaného zariadenia*
+*Ukážka JSON odpovedi na požiadavku získania dát z teplomera. Dáta v odpovede sa líšia na základe filtrovaného zariadenia*
 ```json
 {
     "status": "...",
@@ -310,7 +334,7 @@ Príklad použitia:
 
 **Parametre**
 
-Všetky valídne parametre zariadenia
+Všetky valídne parametre zariadenia.
 
 Taktiež je možné použiť parametre `startDate` a `endDate` s UNIX timestamp hodnotou (v sekundách) pre podrobnejšie filtrovanie podľa času a dátumu. (viď. [požiadavka na základe tokenu](###Podľa-tokenu-zariadenia))
 
@@ -319,6 +343,8 @@ Taktiež je možné použiť parametre `startDate` a `endDate` s UNIX timestamp 
 - `200 OK` ak požiadavka prebehla úspešne
 - `400 Bad Request` ak bol zle špecifikovaný filter resp. neboli uvedené žiadne parametre
 - `404 Not Found` ak neexistuje žiadne zariadenie vyhovujúce požiadavkám
+
+Ukážka JSON odpovede:
 
 ```json
 {
@@ -337,7 +363,7 @@ JSON objekt je podobný ako u [požiadavky na základe tokenu](####Podľa-tokenu
 ### Získanie jedného záznamu
 **Definícia**
 
-`GET /data/:token>/:id>`
+`GET /data/:token/:id`
 
 **Parametre**
 
@@ -352,7 +378,7 @@ JSON objekt je podobný ako u [požiadavky na základe tokenu](####Podľa-tokenu
 - `404 Not Found` ak zariadenie zodpovedajúce tokenu neexistuje
 - `500 Internal Server Error`
 
-JSON objekt (Dáta sa môžu líšiť podľa typu zariadenia)
+Ukážka JSON odpovede: (Dáta sa môžu líšiť podľa typu zariadenia)
 ```json
 {
     "status": "...",
@@ -377,11 +403,16 @@ JSON objekt (Dáta sa môžu líšiť podľa typu zariadenia)
 
 **Obsah tela**
 
+Obsah sa môže líšiť podľa typu zariadenia.
+(1) Thermometer, lightsensor, humiditysensor
+
 | Parameter   |      Typ      |  Pozn. |
 |:----------|:-------------|:------|
 | `token`* | string | Identifikátor zariadenia |
 | `value` |  number | Nová hodnota záznamu |
 | `timestamp` |  number | UNIX timestamp od (v sekundách) |
+
+Ukážka tela požiadavky:
 
 ```json
 {
@@ -396,6 +427,8 @@ JSON objekt (Dáta sa môžu líšiť podľa typu zariadenia)
 - `404 Not Found` ak zariadenie zodpovedajúce tokenu neexistuje
 - `500 Internal Server Error`
 
+Ukážka JSON odpovede:
+
 ```json
 {
     "status": "...",
@@ -403,10 +436,10 @@ JSON objekt (Dáta sa môžu líšiť podľa typu zariadenia)
 }
 ```
 
-### Mazanie dát
+### Odstránenie záznamu dát
 **Definícia**
 
-Dáta je možne mazať dvoma spôsobmi:
+Záznamy dát je možne odstrániť dvoma spôsobmi:
 
 1. Podľa ID
 
@@ -430,6 +463,8 @@ Dáta je možne mazať dvoma spôsobmi:
 |:----------|:-------------|:------|
 | `token`* |  string | Identifikátor zariadenia |
 
+Ukážka tela požiadavky:
+
 ```json
 {
     "token": "..."
@@ -437,10 +472,12 @@ Dáta je možne mazať dvoma spôsobmi:
 ```
 
 **Odpoveď**
-- `200 No Content` ak bola požiadavka úspešná a požadované záznamy boli zmazané
+- `200 No Content` ak bola požiadavka úspešná a požadované záznamy boli odstránené
 - `400 Bad Request` ak chýba niektorý z povinných údajov v požiadavke
 - `404 Not Found` ak neexistuje zariadenie zodpovedajúce tokenu
 - `500 Internal Server Error`
+
+Ukážka JSON odpovede:
 
 ```json
 {
@@ -466,7 +503,7 @@ Dáta je možne mazať dvoma spôsobmi:
 - `400 Bad Request` ak chýba povinný údaj v požiadavke
 - `500 Internal Server Error`
 
-JSON objekt
+Ukážka JSON odpovede:
 ```json
 {
     "status": "...",
@@ -495,6 +532,8 @@ JSON objekt
 | `sat` |  number | Saturácia svetla |
 | `brightness` |  number | Jas svetla |
 
+Ukážka tela požiadavky:
+
 ```json
 {
     "token": "...",
@@ -506,6 +545,8 @@ JSON objekt
 - `200 OK` ak požiadavka prebehla úspešne
 - `400 Bad Request` ak chýba povinný údaj v požiadavke
 - `500 Internal Servero Error`
+
+Ukážka JSON odpovede:
 
 ```json
 {
